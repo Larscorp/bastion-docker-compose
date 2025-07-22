@@ -16,8 +16,7 @@ jobs:
           event-type: submodule-update
           client-payload: >
             {
-              "submodule": "${{ github.repository }}",
+              "submodule": "bastion/docker-compose",
               "ref": "${{ github.ref_name }}",
-              "title": "bastion/compose",
               "message": "${{ github.event.head_commit.message }}"
             }
