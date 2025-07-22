@@ -1,0 +1,23 @@
+name: Notify Main Repo
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository_dispatch event
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: Larscorp/homelab
+          event-type: submodule-update
+          client-payload: >
+            {
+              "submodule": "${{ github.repository }}",
+              "ref": "${{ github.ref_name }}",
+              "title": "bastion/compose",
+              "message": "${{ github.event.head_commit.message }}"
+            }
