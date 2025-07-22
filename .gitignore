@@ -1,1 +1,10 @@
-*.env
+data/
+logs/
+
+# Ignore secrets files
+.env
+acme.json
+database.db
+
+# But commit their encrypted version
+!*.crypt

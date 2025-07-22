@@ -13,7 +13,7 @@ services:
       - "host.docker.internal:host-gateway"
       - "nas.local:192.168.1.17"
     volumes:
-      - "./appdata:/appdata"
+      - "./data:/appdata"
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       PUID: 1000

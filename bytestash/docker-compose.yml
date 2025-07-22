@@ -10,7 +10,7 @@ services:
     networks:
       - traefik-net
     volumes:
-      - ./config:/data/snippets
+      - ./data:/data/snippets
     environment:
       - BASE_PATH=
       - JWT_SECRET=${JWT_SECRET}

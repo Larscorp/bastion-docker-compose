@@ -18,4 +18,3 @@ services:
       - "traefik.http.routers.omv-power-proxy.entrypoints=websecure"
       - "traefik.http.routers.omv-power-proxy.tls=true"
       - "traefik.http.services.omv-power-proxy.loadbalancer.server.port=5656"
-
