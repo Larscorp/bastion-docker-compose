@@ -1,0 +1,8 @@
+services:
+  smash_or_pass:
+    image: ghcr.io/larsluph/smash_or_pass
+    restart: unless-stopped
+    environment:
+    - DISCORD_TOKEN=${DISCORD_TOKEN}
+    - CLIENT_ID=${CLIENT_ID}
+    - RESTRICTED_CHANNEL_ID=${RESTRICTED_CHANNEL_ID}

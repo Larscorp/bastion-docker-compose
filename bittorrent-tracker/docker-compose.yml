@@ -1,0 +1,18 @@
+services:
+  bittorrent-tracker:
+    image: jarylc/bittorrent-tracker
+    container_name: bittorrent-tracker
+    restart: unless-stopped
+    ports:
+    - "6969:6969"
+    - "6969:6969/udp"
+    environment:
+    - PORT=6969
+    - HTTP=1
+    - UDP=1
+    - WS=1
+    - STATS=1
+    - INTERVAL=600000
+    - TRUST_PROXY=0
+    - QUIET=1
+    - SILENT=0

@@ -1,0 +1,33 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  fsb:
+#    command: "config set --auth.method=proxy --auth.header=X-authentik-username"
+    image: filebrowser/filebrowser:latest
+    container_name: fsb
+    restart: unless-stopped
+    user: "1000:1000"
+    networks:
+      - traefik-net
+    volumes:
+      # Files
+      - /home/larsluph:/srv
+      # filebrowser.db
+      - ./config:/database
+      # settings.json
+      - ./config:/config
+    labels:
+      - traefik.enable=true
+
+      - traefik.http.routers.fsb-bastion.rule=Host(`files.larsluph.dev`) && PathPrefix(`/bastion`)
+      - traefik.http.routers.fsb-bastion.entrypoints=websecure
+      - traefik.http.routers.fsb-bastion.tls=true
+      - traefik.http.routers.fsb-bastion.middlewares=authentik@file
+
+#      - traefik.http.routers.fsb-bastion-share.rule=Host(`files.larsluph.dev`) && PathRegexp(`/bastion/(api/public|share|static)/.+`)
+#      - traefik.http.routers.fsb-bastion-share.entrypoints=websecure
+#      - traefik.http.routers.fsb-bastion-share.tls=true
+
+      - traefik.http.services.fsb-bastion.loadbalancer.server.port=37488

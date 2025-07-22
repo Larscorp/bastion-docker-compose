@@ -1,0 +1,15 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  tracker:
+    image: larsluph/bittorrent-tracker:latest
+    build: .
+    container_name: bittorrent-tracker
+    restart: unless-stopped
+    networks:
+    - traefik-net
+    ports:
+    - "6969:8000"
+    - "6969:8000/udp"

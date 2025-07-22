@@ -1,0 +1,24 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  wetty:
+    container_name: wetty
+    image: wettyoss/wetty:latest
+    restart: unless-stopped
+    networks:
+      - traefik-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      - "--base=/bastion"
+      - "--ssh-host=host.docker.internal"
+      - "--ssh-auth=publickey,password"
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.wetty-bastion.rule=Host(`ssh.larsluph.dev`) && PathPrefix(`/bastion`)"
+      - "traefik.http.routers.wetty-bastion.entrypoints=websecure"
+      - "traefik.http.routers.wetty-bastion.tls=true"
+      - "traefik.http.routers.wetty-bastion.middlewares=authentik@file"

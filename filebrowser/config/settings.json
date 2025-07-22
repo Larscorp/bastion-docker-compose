@@ -1,0 +1,9 @@
+{
+  "port": 37488,
+  "baseURL": "/bastion",
+  "address": "",
+  "log": "stdout",
+  "database": "/config/database.db",
+  "root": "/srv"
+}
+

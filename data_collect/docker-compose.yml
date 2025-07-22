@@ -1,0 +1,20 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  data-collect:
+    image: ghcr.io/larsluph/data_collect
+    container_name: data-collect
+    restart: unless-stopped
+    user: 1000:1000
+    networks:
+    - traefik-net
+    volumes:
+    - ./data:/app/instance
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.data-collect.rule=Host(`data.larsluph.dev`)"
+    - "traefik.http.routers.data-collect.entrypoints=websecure"
+    - "traefik.http.routers.data-collect.tls=true"
+    - "traefik.http.services.data-collect.loadbalancer.server.port=5000"

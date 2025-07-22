@@ -1,0 +1,32 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  bytestash:
+    image: ghcr.io/jordan-dalby/bytestash:latest
+    container_name: bytestash
+    restart: unless-stopped
+    networks:
+      - traefik-net
+    volumes:
+      - ./config:/data/snippets
+    environment:
+      - BASE_PATH=
+      - JWT_SECRET=${JWT_SECRET}
+      # how long the token lasts, examples: "2 days", "10h", "7d", "1m", "60s"
+      - TOKEN_EXPIRY=6h
+      # if auth username or password are left blank then authorisation is disabled
+      - AUTH_USERNAME=
+      - AUTH_PASSWORD=
+      - OIDC_ENABLED=true
+      - OIDC_DISPLAY_NAME=SSO
+      - OIDC_ISSUER_URL=https://idp.larsluph.dev/application/o/bytestash/
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_SCOPES=openid profile email groups
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bytestash.rule=Host(`snippets.larsluph.dev`)"
+      - "traefik.http.routers.bytestash.entrypoints=websecure"
+      - "traefik.http.routers.bytestash.tls=true"

@@ -1,0 +1,165 @@
+http:
+  routers:
+    jellyfin:
+      rule: "Host(`media.larsluph.dev`)"
+      service: jellyfin
+      entrypoints: websecure
+      tls: {}
+    qbit:
+      rule: "Host(`downloads.larsluph.dev`)"
+      service: qbit
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+    stash:
+      rule: "Host(`stash.larsluph.dev`)"
+      service: stash
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+    omv:
+      rule: "Host(`omv.larsluph.dev`)"
+      service: omv
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    fsb:
+      rule: "Host(`files.larsluph.dev`) && PathPrefix(`/nas`)"
+      service: fsb
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    tdarr:
+      rule: "Host(`tdarr.larsluph.dev`)"
+      service: tdarr
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    webtop:
+      rule: "Host(`vm.larsluph.dev`)"
+      service: webtop
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    cterm:
+      rule: "Host(`ssh.larsluph.dev`) && PathPrefix(`/nas`)"
+      service: cterm
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    convertx:
+      rule: "Host(`convert.larsluph.dev`)"
+      service: convertx
+      entrypoints: websecure
+      middlewares:
+      - authentik
+      tls: {}
+
+    plik:
+      rule: "Host(`share.larsluph.dev`)"
+      service: plik
+      entrypoints: websecure
+#      middlewares:
+#      - authentik
+      tls: {}
+
+
+    # bazarr:
+    #   rule: "Host(`servarr.larsluph.dev`) && PathPrefix(`/subtitles`)"
+    #   service: prowlarr
+    #   middlewares:
+    #   - authentik
+    #   tls: {}
+    # prowlarr:
+    #   rule: "Host(`servarr.larsluph.dev`) && PathPrefix(`/indexers`)"
+    #   service: prowlarr
+    #   middlewares:
+    #   - authentik
+    #   tls: {}
+    radarr:
+      rule: "Host(`servarr.larsluph.dev`) && PathPrefix(`/movies`)"
+      service: radarr
+      middlewares:
+      - authentik
+      tls: {}
+    sonarr:
+      rule: "Host(`servarr.larsluph.dev`) && PathPrefix(`/series`)"
+      service: sonarr
+      middlewares:
+      - authentik
+      tls: {}
+
+  services:
+    jellyfin:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:8096
+    fsb:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:37488
+    qbit:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:8080
+    stash:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:9999
+    omv:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:61234
+    tdarr:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:8265
+    webtop:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:4545
+    cterm:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:5000
+    convertx:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:7634
+    plik:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:7777
+    # bazarr:
+    #   loadBalancer:
+    #     servers:
+    #     - url: http://nas.local:6767
+    # prowlarr:
+    #   loadBalancer:
+    #     servers:
+    #     - url: http://nas.local:9696
+    radarr:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:7878
+    sonarr:
+      loadBalancer:
+        servers:
+        - url: http://nas.local:8989
+  middlewares:
+    stripprefix-cterm:
+      stripPrefix:
+        prefixes:
+          - "/nas"

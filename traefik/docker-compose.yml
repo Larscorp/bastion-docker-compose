@@ -1,0 +1,178 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+    - no-new-privileges:true
+    networks:
+    - traefik-net
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    - "nas.local:192.168.1.17"
+    volumes:
+    - "/etc/localtime:/etc/localtime:ro"
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    - "./config:/data"
+    - "./logs:/logs"
+    ports:
+    # HTTP
+    - 80:80
+    # HTTPS
+    - 443:443/tcp
+    # HTTPS-QUIC
+    - 443:443/udp
+    environment:
+      OVH_ENDPOINT: ${OVH_ENDPOINT}
+      OVH_APPLICATION_KEY: ${OVH_APPLICATION_KEY}
+      OVH_APPLICATION_SECRET: ${OVH_APPLICATION_SECRET}
+      OVH_CONSUMER_KEY: ${OVH_CONSUMER_KEY}
+    command:
+      ##########
+      # Config #
+      ##########
+
+      - "--global.checknewversion=true"
+      - "--global.sendanonymoususage=true"
+
+      - "--api.dashboard=true"
+
+      - "--ping=true"
+
+      ########
+      # Logs #
+      ########
+
+      - "--log.filePath=/logs/traefik.log"
+      - "--log.format=json"
+      - "--log.level=INFO"
+      - "--log.maxSize=10"
+      - "--log.compress=true"
+
+      # - "--accessLog=true"
+      # - "--accessLog.filePath=/logs/access.log"
+      # - "--accessLog.format=json"
+      # - "--accessLog.bufferingSize=10"
+      # - "--accessLog.fields.defaultMode=drop"
+
+      # - "--accessLog.fields.names.ClientAddr=keep"
+      # - "--accessLog.fields.names.RequestAddr=keep"
+      # - "--accessLog.fields.names.RequestPath=keep"
+      # - "--accessLog.fields.names.RequestMethod=keep"
+      # - "--accessLog.fields.names.ClientUsername=drop"
+      # - "--accessLog.fields.names.RouterName=keep"
+      # - "--accessLog.fields.names.ServiceAddr=drop"
+      # - "--accessLog.fields.names.ServiceName=keep"
+      # - "--accessLog.fields.names.ServiceURL=drop"
+      # - "--accessLog.fields.names.TLSCipher=drop"
+      # - "--accessLog.fields.names.TLSVersion=drop"
+
+      # - "--accessLog.fields.headers.defaultMode=drop"
+      # - "--accessLog.fields.headers.names.Accept=drop"
+      # - "--accessLog.fields.headers.names.Accept-Encoding=drop"
+      # - "--accessLog.fields.headers.names.Accept-Language=drop"
+      # - "--accessLog.fields.headers.names.Content-Type=drop"
+      # - "--accessLog.fields.headers.names.Cookie=drop"
+      # - "--accessLog.fields.headers.names.Priority=drop"
+      # - "--accessLog.fields.headers.names.Referer=drop"
+      # - "--accessLog.fields.headers.names.Sec-Ch-Ua=drop"
+      # - "--accessLog.fields.headers.names.Sec-Ch-Ua-Mobile=drop"
+      # - "--accessLog.fields.headers.names.Sec-Ch-Ua-Platform=drop"
+      # - "--accessLog.fields.headers.names.Sec-Fetch-Dest=drop"
+      # - "--accessLog.fields.headers.names.Sec-Fetch-Mode=drop"
+      # - "--accessLog.fields.headers.names.Sec-Fetch-Site=drop"
+      # - "--accessLog.fields.headers.names.Sec-Gpc=drop"
+      # - "--accessLog.fields.headers.names.User-Agent=drop"
+      # - "--accessLog.fields.headers.names.X-Forwarded-Server=drop"
+      # - "--accessLog.fields.headers.names.Vary=drop"
+      # - "--accessLog.fields.headers.names.Set-Cookie=drop"
+      # - "--accessLog.fields.headers.names.Date=drop"
+      # - "--accessLog.fields.headers.names.Content-Encoding=drop"
+      # - "--accessLog.fields.headers.names.Content-Security-Policy=drop"
+      # - "--accessLog.fields.headers.names.Cache-Control=drop"
+      # - "--accessLog.fields.headers.names.X-authentik-username=keep"
+      # - "--accessLog.fields.headers.names.X-authentik-groups=redacted"
+      # - "--accessLog.fields.headers.names.X-authentik-email=redacted"
+      # - "--accessLog.fields.headers.names.X-authentik-name=redacted"
+      # - "--accessLog.fields.headers.names.X-authentik-uid=redacted"
+      # - "--accessLog.fields.headers.names.X-authentik-jwt=redacted"
+      # - "--accessLog.fields.headers.names.X-authentik-meta-jwks=drop"
+      # - "--accessLog.fields.headers.names.X-authentik-meta-outpost=drop"
+      # - "--accessLog.fields.headers.names.X-authentik-meta-provider=drop"
+      # - "--accessLog.fields.headers.names.X-authentik-meta-app=drop"
+      # - "--accessLog.fields.headers.names.X-authentik-meta-version=drop"
+
+      ###########
+      # Metrics #
+      ###########
+
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addrouterslabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+
+      ###########
+      # Tracing #
+      ###########
+
+      #- "--tracing=true"
+      #- "--tracing.addInternals"
+      #- "--tracing.serviceName=traefik"
+      #- "--tracing.sampleRate=1.0"
+      #- "--tracing.capturedRequestHeaders=X-authentik-username,X-authentik-meta-app"
+      #- "--tracing.capturedResponseHeaders=X-authentik-username,X-authentik-meta-app"
+      #- "--tracing.otlp.grpc.endpoint=tempo:4317"
+      #- "--tracing.otlp.grpc.insecure=true"
+
+      ###############
+      # Entrypoints #
+      ###############
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.web.http.redirections.entrypoint.permanent=true"
+
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.sanitizePath=true"
+      - "--entrypoints.websecure.http3"
+
+      #############
+      # Providers #
+      #############
+
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedByDefault=false"
+
+      - "--providers.file.directory=/data/files.d"
+      - "--providers.file.watch=true"
+
+      ########################
+      # Certificate Resolver #
+      ########################
+
+      - "--certificatesresolvers.ovh.acme.email=remi.marseault+certbot@outlook.com"
+      - "--certificatesresolvers.ovh.acme.storage=/data/acme.json"
+      - "--certificatesresolvers.ovh.acme.caServer=https://acme-v02.api.letsencrypt.org/directory" # prod (default)
+      #- "--certificatesresolvers.ovh.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory" # staging
+      - "--certificatesresolvers.ovh.acme.dnsChallenge.provider=ovh"
+
+    labels:
+      - "traefik.enable=true"
+
+      ###########
+      # Routers #
+      ###########
+
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.larsluph.dev`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=authentik@file"
+      - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=ovh"
+      - "traefik.http.routers.traefik-dashboard.tls.domains[0].main=larsluph.dev"
+      - "traefik.http.routers.traefik-dashboard.tls.domains[0].sans=*.larsluph.dev"
