@@ -10,7 +10,7 @@ services:
     network_mode: host
     env_file: .env
     volumes:
-      - "./config:/data"
+      - "./data:/data"
     labels:
       - "traefik.enable=true"
 
